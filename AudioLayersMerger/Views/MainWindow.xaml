@@ -4,16 +4,58 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:AudioLayersMerger.ViewModels"
-        xmlns:fa="http://schemas.fontawesome.io/icons/"
         mc:Ignorable="d"
-        Title="{Binding Title}" Height="450" Width="800">
+        WindowStyle="None"
+        MouseDown="DockPanel_MouseDown"
+        Foreground="{StaticResource MainColorBrush}"
+        Title="{Binding Title}" Height="388.579" Width="625.766">
     <Window.DataContext>
         <vm:MainWindowViewModel/>
     </Window.DataContext>
-    <StackPanel>
-        <DockPanel>
-            <Button Content="Исходный файл"/>
-            <TextBox Text="{Binding SourceFilePath}"/>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <DockPanel LastChildFill="False" Grid.Row="0">
+            <Button Style="{StaticResource CloseButtonStyle}" Command="{StaticResource CloseApplicationCommand}" DockPanel.Dock="Right"/>
         </DockPanel>
-    </StackPanel>
+        <DockPanel Grid.Row="1">
+            <Button DockPanel.Dock="Left" Content="&#xf65e;"
+                    Command="{Binding SelectSourceFileCommand}"
+                    Style="{StaticResource FontAwesomeButtonStyle}"/>
+            <Label DockPanel.Dock="Left" Content="Исходный файл" 
+                   Style="{StaticResource ActionCaptionLabelStyle}"/>
+            <TextBox Text="{Binding SourceFilePath}" 
+                     Style="{StaticResource FilePathTextBoxStyle}" 
+                     Visibility="{Binding SourceFilePathVisibility}"/>
+        </DockPanel>
+        <Grid Grid.Row="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="0" Content="&#xf65e;" 
+                    Command="{Binding SelectLayerFilesCommand}"
+                    Style="{StaticResource FontAwesomeButtonStyle}"/>
+            <Label Grid.Column="1" Content="Файлы для наложения" Style="{StaticResource ActionCaptionLabelStyle}"/>
+            <ListBox Grid.Row="1" Grid.ColumnSpan="2" MinHeight="100" Margin="2 6 2 6" 
+                      Visibility="{Binding LayersListVisibility}"
+                     ItemsSource="{Binding Layers}"></ListBox>
+        </Grid>
+        <DockPanel Grid.Row="3">
+            <Button Content="&#xf5fd;" 
+                    Width="48" Height="48" FontSize="40"
+                    HorizontalAlignment="Left"
+                    Command="{Binding CreateMergedFileCommand}" Style="{StaticResource FontAwesomeButtonStyle}" DockPanel.Dock="Bottom"/>
+            
+        </DockPanel>
+    </Grid>
 </Window>

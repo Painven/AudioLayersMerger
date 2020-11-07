@@ -11,5 +11,13 @@ namespace AudioLayersMerger
         {
             InitializeComponent();
         }
+
+        private void DockPanel_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton == System.Windows.Input.MouseButton.Left)
+            {
+                DragMove();
+            }
+        }
     }
 }

@@ -10,4 +10,12 @@ namespace AudioLayersMerger.Infrastructure.Commands
             window?.Close();
         }
     }
+
+    public class CloseApplicationCommand : Command
+    {
+        public override void Execute(object parameter)
+        {
+            App.Current.Shutdown();
+        }
+    }
 }
