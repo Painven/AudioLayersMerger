@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:AudioLayersMerger.ViewModels"
+        xmlns:v="clr-namespace:AudioLayersMerger.Views"
         mc:Ignorable="d"
         WindowStyle="None"
         MouseDown="DockPanel_MouseDown"
@@ -51,9 +52,15 @@
                     Command="{Binding SelectLayerFilesCommand}"
                     Style="{StaticResource FontAwesomeButtonStyle}"/>
             <Label Grid.Column="1" Grid.Row="1" Content="Файлы на задний фон" Style="{StaticResource ActionCaptionLabelStyle}"/>
-            <ListBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Margin="2 6 2 6" 
-                      Visibility="{Binding Layers.Count, Converter={StaticResource BoolToVisibilityConverter}}"
-                      ItemsSource="{Binding Layers}"></ListBox>
+            <ListBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Margin="2 6 2 6"        
+                     Visibility="{Binding Layers.Count, Converter={StaticResource BoolToVisibilityConverter}}"
+                      ItemsSource="{Binding Layers}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <v:BackgroundFileControl DataContext="{Binding}"/>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
 
             <Button Grid.Row="3" Content="&#xf028;" 
                     Opacity="{Binding Volume}"

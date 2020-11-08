@@ -71,8 +71,6 @@ namespace AudioLayersMerger.AudioManager
             WaveFileWriter.CreateWaveFile(outputFileName, outputStream);
         }
 
-
-
         private static void CompressMp3(string file)
         {
             var output = Path.Combine(Path.GetDirectoryName(file), "compressed_" + Path.GetFileName(file));
