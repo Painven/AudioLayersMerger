@@ -56,7 +56,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MergeManager.cs" />
+    <Compile Include="IAudioMerger.cs" />
+    <Compile Include="AudioMergerV2.cs" />
+    <Compile Include="SimpleAudioMerger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

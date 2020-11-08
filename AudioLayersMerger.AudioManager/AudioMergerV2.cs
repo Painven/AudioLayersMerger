@@ -9,7 +9,7 @@ using NAudio.Wave.SampleProviders;
 
 namespace AudioLayersMerger.AudioManager
 {
-    public class MergeManager
+    public class AudioMergerV2 : IAudioMerger
     {
         //TODO: тут получается слишком большой выходной файл. Возможно из-за отго что создается большое количество каналов (лесенкой) а нужно всего один
         public void Merge(string sourceFilePath, List<Tuple<string, double>> backgroundFilesAndVolume, string outputFileName)
@@ -40,8 +40,6 @@ namespace AudioLayersMerger.AudioManager
             } while (currentBackgroundTime < totalDuration);
 
             Save(outputFileName, mixer);
-
-            CompressMp3(outputFileName);
 
         }
 

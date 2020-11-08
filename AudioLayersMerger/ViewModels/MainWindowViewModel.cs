@@ -59,7 +59,7 @@ namespace AudioLayersMerger.ViewModels
         public ICommand SelectLayerFilesCommand { get; }
         public ICommand CreateMergedFileCommand { get; }
 
-        MergeManager manager = new MergeManager();
+        IAudioMerger manager = new SimpleAudioMerger();
 
         public MainWindowViewModel()
         {
@@ -74,16 +74,15 @@ namespace AudioLayersMerger.ViewModels
         private void Layers_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             currentPosition = TimeSpan.Zero;
+
             foreach (var item in Layers)
             {
                 if (e.OldItems != null && e.OldItems.Contains(item)) { continue; }
 
                 var duration = new Mp3FileReader(item.FilePath).TotalTime;
 
-                item.StartTime = currentPosition.ToString("hh\\:mm\\:ss");
-                item.EndTime = (currentPosition + duration).ToString("hh\\:mm\\:ss");
                 item.IsOutOfRange = (currentPosition + duration >= mainFileDuration);
-               
+
                 currentPosition += duration;
             }
         }

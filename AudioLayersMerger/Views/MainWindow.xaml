@@ -6,7 +6,8 @@
         xmlns:vm="clr-namespace:AudioLayersMerger.ViewModels"
         xmlns:v="clr-namespace:AudioLayersMerger.Views"
         mc:Ignorable="d"
-        WindowStyle="None"
+        WindowStyle="ToolWindow"
+        SizeToContent="Height"
         MouseDown="DockPanel_MouseDown"
         Foreground="{StaticResource MainColorBrush}"
         Title="{Binding Title}" Height="388.579" Width="625.766">
@@ -14,19 +15,12 @@
         <vm:MainWindowViewModel/>
     </Window.DataContext>
 
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
+    <DockPanel LastChildFill="True">
+        <ProgressBar DockPanel.Dock="Bottom" 
+                     IsIndeterminate="True" Height="20"  
+                     Visibility="{Binding InProgress, Converter={StaticResource BoolToVisibilityConverter}}" />
 
-        <DockPanel LastChildFill="False" Grid.Row="0">
-            <Button Style="{StaticResource CloseButtonStyle}" Command="{StaticResource CloseApplicationCommand}" DockPanel.Dock="Right"/>
-        </DockPanel>
-        
-        <Grid Grid.Row="2">
+        <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
@@ -72,6 +66,6 @@
                     Command="{Binding CreateMergedFileCommand}" Style="{StaticResource FontAwesomeButtonStyle}"/>
         </Grid>
 
-        <ProgressBar Grid.Row="3" Margin="2" IsIndeterminate="True" Height="20"  Visibility="{Binding InProgress, Converter={StaticResource BoolToVisibilityConverter}}" />
-    </Grid>
+        
+    </DockPanel>
 </Window>

@@ -19,12 +19,6 @@ namespace AudioLayersMerger.ViewModels
         public double ItemOpacity => IsOutOfRange ? 0.4 : 1;
         public string FileName => Path.GetFileName(FilePath);
 
-        private string _startTime;
-        public string StartTime { get => _startTime; set => Set(ref _startTime, value); }
-
-        private string _endTime;
-        public string EndTime { get => _endTime; set => Set(ref _endTime, value); }
-
         private bool _isOutOfRange;
         public bool IsOutOfRange { get => _isOutOfRange; set => Set(ref _isOutOfRange, value); }
 

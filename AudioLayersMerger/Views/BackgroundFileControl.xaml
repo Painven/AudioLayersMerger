@@ -26,9 +26,6 @@
                 Command="{Binding RemoveCommand}"
                 Style="{StaticResource CloseButtonStyle}"/>
 
-        <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding StartTime}"/>
-        <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding EndTime}"/>
-
         <Slider Grid.Row="0" Grid.Column="2" Grid.RowSpan="2" 
                 Margin="8 2 8 2"
                 BorderThickness="2"
