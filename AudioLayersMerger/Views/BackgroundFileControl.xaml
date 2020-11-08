@@ -4,12 +4,15 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:vm="clr-namespace:AudioLayersMerger.ViewModels"
-             mc:Ignorable="d" 
+                    
              Background="White"         
-             d:DataContext="{d:DesignInstance Type=vm:BackgroundFileViewModel, IsDesignTimeCreatable=True}"
-             d:DesignHeight="50" d:DesignWidth="600">
-    <Grid Margin="6">
+             d:DataContext="{d:DesignInstance vm:BackgroundFileViewModel, IsDesignTimeCreatable=True}"
+             Opacity="{Binding ItemOpacity}"
+             d:DesignHeight="50" d:DesignWidth="600"
+             mc:Ignorable="d">
+    <Grid Margin="6" HorizontalAlignment="Stretch">
         <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="200"/>
             <ColumnDefinition Width="*"/>
@@ -19,10 +22,14 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding StartTime}"/>
-        <TextBlock Grid.Row="1" Grid.Column="0" Text="{Binding EndTime}"/>
+        <Button Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" 
+                Command="{Binding RemoveCommand}"
+                Style="{StaticResource CloseButtonStyle}"/>
 
-        <Slider Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" 
+        <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding StartTime}"/>
+        <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding EndTime}"/>
+
+        <Slider Grid.Row="0" Grid.Column="2" Grid.RowSpan="2" 
                 Margin="8 2 8 2"
                 BorderThickness="2"
                 BorderBrush="LightGray"
@@ -30,7 +37,7 @@
                 Minimum="0" Maximum="1" 
                 Value="{Binding Volume}"/>
 
-        <TextBlock Grid.Row="0" Grid.Column="2" Grid.RowSpan="2"
+        <TextBlock Grid.Row="0" Grid.Column="3" Grid.RowSpan="2"
                    VerticalAlignment="Center"
                    Text="{Binding FileName, FallbackValue=123.mp3}"></TextBlock>
     </Grid>

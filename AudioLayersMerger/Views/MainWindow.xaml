@@ -57,7 +57,7 @@
                       ItemsSource="{Binding Layers}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <v:BackgroundFileControl DataContext="{Binding}"/>
+                        <v:BackgroundFileControl DataContext="{Binding}" HorizontalContentAlignment="Stretch"/>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>

@@ -14,6 +14,9 @@ namespace AudioLayersMerger.ViewModels
 {
     public class MainWindowViewModel : ViewModelBase
     {
+        TimeSpan currentPosition;
+        TimeSpan mainFileDuration;
+
         string _title = "Заголовок окна из ViewModel";
         public string Title
         {
@@ -25,7 +28,15 @@ namespace AudioLayersMerger.ViewModels
         public ObservableCollection<BackgroundFileViewModel> Layers { get => _layers; set => Set(ref _layers, value); }
 
         private string _sourceFilePath;
-        public string SourceFilePath { get => _sourceFilePath; set { Set(ref _sourceFilePath, value); } }
+        public string SourceFilePath 
+        { 
+            get => _sourceFilePath; 
+            set 
+            { 
+                Set(ref _sourceFilePath, value);
+                mainFileDuration = new Mp3FileReader(SourceFilePath).TotalTime;
+            } 
+        }
 
         private bool _inProgress;
         public bool InProgress { get => _inProgress; set => Set(ref _inProgress, value); }
@@ -53,10 +64,28 @@ namespace AudioLayersMerger.ViewModels
         public MainWindowViewModel()
         {
             SelectSourceFileCommand = new LambdaCommand(OpenSourceFileDialog);
-            SelectLayerFilesCommand = new LambdaCommand(OpenLayerFilesDialog);
+            SelectLayerFilesCommand = new LambdaCommand(OpenLayerFilesDialog, (p) => File.Exists(SourceFilePath));
             CreateMergedFileCommand = new LambdaCommand(MergeFiles, (p) => !string.IsNullOrEmpty(SourceFilePath) && Layers.Count > 0);
 
             Layers = new ObservableCollection<BackgroundFileViewModel>();
+            Layers.CollectionChanged += Layers_CollectionChanged;
+        }
+
+        private void Layers_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            currentPosition = TimeSpan.Zero;
+            foreach (var item in Layers)
+            {
+                if (e.OldItems != null && e.OldItems.Contains(item)) { continue; }
+
+                var duration = new Mp3FileReader(item.FilePath).TotalTime;
+
+                item.StartTime = currentPosition.ToString("hh\\:mm\\:ss");
+                item.EndTime = (currentPosition + duration).ToString("hh\\:mm\\:ss");
+                item.IsOutOfRange = (currentPosition + duration >= mainFileDuration);
+               
+                currentPosition += duration;
+            }
         }
 
         private async void MergeFiles(object obj)
@@ -90,25 +119,24 @@ namespace AudioLayersMerger.ViewModels
             var ofd = new System.Windows.Forms.OpenFileDialog() { Multiselect = true };
             if (ofd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
-                TimeSpan mainFileDuration = new Mp3FileReader(SourceFilePath).TotalTime;
-                TimeSpan currentPosition = TimeSpan.Zero;
-
                 foreach (var file in ofd.FileNames)
                 {
-                    var duration = new Mp3FileReader(file).TotalTime;
-
-                    var item = new BackgroundFileViewModel(file)
-                    {
-                        StartTime = currentPosition.ToString("hh:mm:ss"),
-                        EndTime = (currentPosition + duration).ToString("hh:mm:ss"),
-                        IsOutOfRange = (currentPosition + duration >= mainFileDuration)
-                    };
-
+                    var item = new BackgroundFileViewModel(file);
+                    item.Volume = Volume;
+                    item.OnRemove += Item_OnRemove;
                     Layers.Add(item);
-
-                    currentPosition += duration;
                 }
             }
+        }
+
+        private void RefreshDuration()
+        {
+
+        }
+
+        private void Item_OnRemove(object sender, EventArgs e)
+        {
+            Layers.Remove(sender as BackgroundFileViewModel);
         }
     }
 }
