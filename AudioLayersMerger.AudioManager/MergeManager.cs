@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using NAudio.Wave;
+using NAudio.Wave.SampleProviders;
 
 namespace AudioLayersMerger.AudioManager
 {
@@ -27,31 +28,35 @@ namespace AudioLayersMerger.AudioManager
             }
         }
 
-        public void Merge(string sourceFilePath, IEnumerable<string> layers, string outputFileName)
+        public void Merge(string sourceFilePath, List<string> backgroundFiles, string outputFileName)
         {
             var mixer = new WaveMixerStream32 { AutoStop = true };
 
-            var mainChannel = new Mp3FileReader(sourceFilePath);            
+            var mainChannel = new Mp3FileReader(sourceFilePath);
             mixer.AddInputStream(new WaveChannel32(mainChannel));
-            TimeSpan mainTrackLength = mainChannel.TotalTime;
+            TimeSpan totalDuration = mainChannel.TotalTime;
 
-
-            List<Mp3FileReader> backgroundLayers = layers.Select(path => new Mp3FileReader(path)).ToList();
 
             TimeSpan currentBackgroundTime = TimeSpan.Zero;
             int backgroundIndex = 0;
             do
             {
-                int index = backgroundIndex % backgroundLayers.Count;
-                var reader = backgroundLayers[index];
+                int index = backgroundIndex % backgroundFiles.Count;
 
-                mixer.AddInputStream(new WaveChannel32(reader));
+                var layerStream = new Mp3FileReader(backgroundFiles[index]);
+                var offsetStream = new WaveOffsetStream(layerStream, currentBackgroundTime, TimeSpan.Zero, totalDuration - currentBackgroundTime + layerStream.TotalTime);
+                var channel = new WaveChannel32(offsetStream);
+                channel.PadWithZeroes = false;
+                channel.Volume = 0.4f;
 
-                currentBackgroundTime += reader.TotalTime;
+
+                mixer.AddInputStream(channel);
+
+                currentBackgroundTime += layerStream.TotalTime;
 
                 backgroundIndex++;
 
-            } while (currentBackgroundTime < mainTrackLength);
+            } while (currentBackgroundTime < totalDuration);
 
             WaveFileWriter.CreateWaveFile(outputFileName, new Wave32To16Stream(mixer));
         }

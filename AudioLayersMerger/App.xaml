@@ -9,6 +9,7 @@
                 <ResourceDictionary Source="Resources/ResourceDictionaries/Brushes.xaml"/>
                 <ResourceDictionary Source="Resources/ResourceDictionaries/Commands.xaml"/>
                 <ResourceDictionary Source="Resources/ResourceDictionaries/Styles.xaml"/>
+                <ResourceDictionary Source="Resources/ResourceDictionaries/Converters.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
             

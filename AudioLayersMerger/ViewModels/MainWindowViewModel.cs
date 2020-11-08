@@ -26,6 +26,9 @@ namespace AudioLayersMerger.ViewModels
         private string _sourceFilePath;
         public string SourceFilePath { get => _sourceFilePath; set { Set(ref _sourceFilePath, value); RaisePropertyChanged(nameof(SourceFilePathVisibility)); } }
 
+        private bool _inProgress;
+        public bool InProgress { get => _inProgress; set => Set(ref _inProgress, value); }
+
         public Visibility SourceFilePathVisibility => File.Exists(SourceFilePath) ? Visibility.Visible : Visibility.Collapsed;
         public Visibility LayersListVisibility => Layers.Any() ? Visibility.Visible : Visibility.Collapsed;
 
@@ -33,17 +36,15 @@ namespace AudioLayersMerger.ViewModels
         public ICommand SelectLayerFilesCommand { get; }
         public ICommand CreateMergedFileCommand { get; }
 
-        private bool _inProgress;
-        public bool InProgress { get => _inProgress; set => Set(ref _inProgress, value); }
 
-        MergeManager manager = new MergeManager();
+
+        MergeManager manager = new MergeManager() { BackgroundVolumeLevel = 0.5 };
 
         public MainWindowViewModel()
         {
             SelectSourceFileCommand = new LambdaCommand(OpenSourceFileDialog);
             SelectLayerFilesCommand = new LambdaCommand(OpenLayerFilesDialog);
-            //CreateMergedFileCommand = new LambdaCommand(MergeFiles, (p) => !string.IsNullOrEmpty(SourceFilePath) && Layers.Count > 0);
-            CreateMergedFileCommand = new LambdaCommand(MergeFiles);
+            CreateMergedFileCommand = new LambdaCommand(MergeFiles, (p) => !string.IsNullOrEmpty(SourceFilePath) && Layers.Count > 0);
 
             Layers = new ObservableCollection<string>();
             Layers.CollectionChanged += (o, e) => RaisePropertyChanged(nameof(LayersListVisibility));
@@ -51,20 +52,18 @@ namespace AudioLayersMerger.ViewModels
 
         private async void MergeFiles(object obj)
         {
-            var sw = new Stopwatch();
-            sw.Start();
-            InProgress = true;
-            string testOutput = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), $"{DateTime.Now.ToString("h-mm")}_merged.wav");
-            await Task.Run(() => manager.Merge(SourceFilePath, Layers, 0.5, testOutput));
-            InProgress = false;
-            MessageBox.Show($"Выполнено за {sw.Elapsed}", "Выполнено", MessageBoxButton.OK, MessageBoxImage.Information);
+            string newFileName = "merged_" + Path.GetFileName(SourceFilePath);
+            var sfd = new System.Windows.Forms.SaveFileDialog() { FileName = newFileName, InitialDirectory = Path.GetDirectoryName(SourceFilePath) };
 
-            //string newFileName = "merged_" + Path.GetFileName(SourceFilePath);
-            //var sfd = new SaveFileDialog() { FileName = newFileName, InitialDirectory = Path.GetDirectoryName(SourceFilePath) };
-            //if (sfd.ShowDialog() == DialogResult.OK)
-            //{
-            //    manager.Merge(SourceFilePath, Layers, 0, null);
-            //}
+            if (sfd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                var sw = new Stopwatch();
+                sw.Start();
+                InProgress = true;
+                await Task.Run(() => manager.Merge(SourceFilePath, Layers.ToList(), sfd.FileName));
+                InProgress = false;
+                MessageBox.Show($"Выполнено за {sw.Elapsed}", "Выполнено", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
         }
 
         private void OpenSourceFileDialog(object obj)
