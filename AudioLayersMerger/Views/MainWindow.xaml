@@ -50,12 +50,15 @@
                       Visibility="{Binding LayersListVisibility}"
                      ItemsSource="{Binding Layers}"></ListBox>
         </Grid>
-        <DockPanel Grid.Row="3">
+        <DockPanel Grid.Row="3" LastChildFill="True">
             <Button Content="&#xf5fd;" 
                     Width="48" Height="48" FontSize="40"
-                    HorizontalAlignment="Left"
-                    Command="{Binding CreateMergedFileCommand}" Style="{StaticResource FontAwesomeButtonStyle}" DockPanel.Dock="Bottom"/>
-            
+                    DockPanel.Dock="Left"
+                    Command="{Binding CreateMergedFileCommand}" Style="{StaticResource FontAwesomeButtonStyle}"/>
+            <ProgressBar IsIndeterminate="True" 
+                         Visibility="{Binding InProgress, Converter={StaticResource BoolToVisibilityConverter}}"
+                         Margin="2"/>
+
         </DockPanel>
     </Grid>
 </Window>
