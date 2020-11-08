@@ -9,7 +9,15 @@ namespace AudioLayersMerger.Infrastructure.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return ((bool)value) ? Visibility.Visible : Visibility.Collapsed;
+            if (value is bool)
+            {
+                return ((bool)value) ? Visibility.Visible : Visibility.Collapsed;
+            }
+            else if(value is int)
+            {
+                return ((int)value) > 0 ? Visibility.Visible : Visibility.Collapsed;
+            }
+            return null;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

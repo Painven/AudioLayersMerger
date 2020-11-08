@@ -20,45 +20,51 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
+
         <DockPanel LastChildFill="False" Grid.Row="0">
             <Button Style="{StaticResource CloseButtonStyle}" Command="{StaticResource CloseApplicationCommand}" DockPanel.Dock="Right"/>
         </DockPanel>
-        <DockPanel Grid.Row="1">
-            <Button DockPanel.Dock="Left" Content="&#xf65e;"
-                    Command="{Binding SelectSourceFileCommand}"
-                    Style="{StaticResource FontAwesomeButtonStyle}"/>
-            <Label DockPanel.Dock="Left" Content="Исходный файл" 
-                   Style="{StaticResource ActionCaptionLabelStyle}"/>
-            <TextBox Text="{Binding SourceFilePath}" 
-                     Style="{StaticResource FilePathTextBoxStyle}" 
-                     Visibility="{Binding SourceFilePathVisibility}"/>
-        </DockPanel>
+        
         <Grid Grid.Row="2">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Button Grid.Column="0" Content="&#xf65e;" 
+
+            <Button DockPanel.Dock="Left" Content="&#xf65e;"
+                    Grid.Row="0" Grid.Column="0"
+                    Command="{Binding SelectSourceFileCommand}"
+                    Style="{StaticResource FontAwesomeButtonStyle}"/>
+            <Label Grid.Column="1" Grid.Row="0" 
+                   Content="{Binding SourceFilePath, TargetNullValue=Основная звуковая дорожка}" 
+                   
+                   Style="{StaticResource ActionCaptionLabelStyle}"/>
+
+            <Button Grid.Column="0" Grid.Row="1" Content="&#xf65e;" 
                     Command="{Binding SelectLayerFilesCommand}"
                     Style="{StaticResource FontAwesomeButtonStyle}"/>
-            <Label Grid.Column="1" Content="Файлы для наложения" Style="{StaticResource ActionCaptionLabelStyle}"/>
-            <ListBox Grid.Row="1" Grid.ColumnSpan="2" MinHeight="100" Margin="2 6 2 6" 
-                      Visibility="{Binding LayersListVisibility}"
-                     ItemsSource="{Binding Layers}"></ListBox>
-        </Grid>
-        <DockPanel Grid.Row="3" LastChildFill="True">
-            <Button Content="&#xf5fd;" 
-                    Width="48" Height="48" FontSize="40"
-                    DockPanel.Dock="Left"
-                    Command="{Binding CreateMergedFileCommand}" Style="{StaticResource FontAwesomeButtonStyle}"/>
-            <ProgressBar IsIndeterminate="True" 
-                         Visibility="{Binding InProgress, Converter={StaticResource BoolToVisibilityConverter}}"
-                         Margin="2"/>
+            <Label Grid.Column="1" Grid.Row="1" Content="Файлы на задний фон" Style="{StaticResource ActionCaptionLabelStyle}"/>
+            <ListBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Margin="2 6 2 6" 
+                      Visibility="{Binding Layers.Count, Converter={StaticResource BoolToVisibilityConverter}}"
+                      ItemsSource="{Binding Layers}"></ListBox>
 
-        </DockPanel>
+            <Button Grid.Row="3" Content="&#xf028;" 
+                    Opacity="{Binding Volume}"
+                    Style="{StaticResource FontAwesomeButtonStyle}"/>
+            <Slider Grid.Row="3" Grid.Column="1" VerticalAlignment="Center" Margin="30 1 4 1" Maximum="1" Minimum="0.05" Value="{Binding Volume}" SmallChange="0.01" LargeChange="0.1"/>
+           
+            <Button Content="&#xf5fd;" 
+                    Grid.Row="4" Grid.Column="0"
+                    Command="{Binding CreateMergedFileCommand}" Style="{StaticResource FontAwesomeButtonStyle}"/>
+        </Grid>
+
+        <ProgressBar Grid.Row="3" Margin="2" IsIndeterminate="True" Height="20"  Visibility="{Binding InProgress, Converter={StaticResource BoolToVisibilityConverter}}" />
     </Grid>
 </Window>

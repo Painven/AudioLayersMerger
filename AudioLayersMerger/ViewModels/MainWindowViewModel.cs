@@ -24,13 +24,13 @@ namespace AudioLayersMerger.ViewModels
         public ObservableCollection<string> Layers { get => _layers; set => Set(ref _layers, value); }
 
         private string _sourceFilePath;
-        public string SourceFilePath { get => _sourceFilePath; set { Set(ref _sourceFilePath, value); RaisePropertyChanged(nameof(SourceFilePathVisibility)); } }
+        public string SourceFilePath { get => _sourceFilePath; set { Set(ref _sourceFilePath, value); } }
 
         private bool _inProgress;
         public bool InProgress { get => _inProgress; set => Set(ref _inProgress, value); }
 
-        public Visibility SourceFilePathVisibility => File.Exists(SourceFilePath) ? Visibility.Visible : Visibility.Collapsed;
-        public Visibility LayersListVisibility => Layers.Any() ? Visibility.Visible : Visibility.Collapsed;
+        private double _volume = 0.5;
+        public double Volume { get => _volume; set => Set(ref _volume, value); }
 
         public ICommand SelectSourceFileCommand { get; }
         public ICommand SelectLayerFilesCommand { get; }
@@ -47,7 +47,6 @@ namespace AudioLayersMerger.ViewModels
             CreateMergedFileCommand = new LambdaCommand(MergeFiles, (p) => !string.IsNullOrEmpty(SourceFilePath) && Layers.Count > 0);
 
             Layers = new ObservableCollection<string>();
-            Layers.CollectionChanged += (o, e) => RaisePropertyChanged(nameof(LayersListVisibility));
         }
 
         private async void MergeFiles(object obj)
@@ -60,6 +59,7 @@ namespace AudioLayersMerger.ViewModels
                 var sw = new Stopwatch();
                 sw.Start();
                 InProgress = true;
+                manager.BackgroundVolumeLevel = Volume;
                 await Task.Run(() => manager.Merge(SourceFilePath, Layers.ToList(), sfd.FileName));
                 InProgress = false;
                 MessageBox.Show($"Выполнено за {sw.Elapsed}", "Выполнено", MessageBoxButton.OK, MessageBoxImage.Information);
