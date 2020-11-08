@@ -47,10 +47,12 @@ namespace AudioLayersMerger.ViewModels
             get => _volume; 
             set
             {
+                double diff = _volume - value;
                 Set(ref _volume, value);
+                
                 foreach(var layer in Layers)
                 {
-                    layer.Volume = value;
+                    layer.Volume -= diff;
                 }
             }
         }
