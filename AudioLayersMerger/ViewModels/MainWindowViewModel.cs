@@ -17,7 +17,7 @@ namespace AudioLayersMerger.ViewModels
         TimeSpan currentPosition;
         TimeSpan mainFileDuration;
 
-        string _title = "Заголовок окна из ViewModel";
+        string _title = "Audio Merger";
         public string Title
         {
             get => _title;
@@ -98,8 +98,9 @@ namespace AudioLayersMerger.ViewModels
                 var sw = new Stopwatch();
                 sw.Start();
                 InProgress = true;
-                manager.BackgroundVolumeLevel = Volume;
-                await Task.Run(() => manager.Merge(SourceFilePath, Layers.Select(l => l.FilePath).ToList(), sfd.FileName));
+
+                await Task.Run(() => manager.Merge(SourceFilePath, Layers.Select(l => Tuple.Create(l.FilePath, l.Volume)).ToList(), sfd.FileName));
+
                 InProgress = false;
                 MessageBox.Show($"Выполнено за {sw.Elapsed}", "Выполнено", MessageBoxButton.OK, MessageBoxImage.Information);
             }
@@ -128,12 +129,7 @@ namespace AudioLayersMerger.ViewModels
                 }
             }
         }
-
-        private void RefreshDuration()
-        {
-
-        }
-
+        
         private void Item_OnRemove(object sender, EventArgs e)
         {
             Layers.Remove(sender as BackgroundFileViewModel);

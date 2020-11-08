@@ -11,28 +11,8 @@ namespace AudioLayersMerger.AudioManager
 {
     public class MergeManager
     {
-        private double _backgroundVolumeLevel = 0.75;
-        public double BackgroundVolumeLevel
-        {
-            get => _backgroundVolumeLevel;
-            set
-            {
-                if(value >= 0 && value <= 1)
-                {
-                    if (value != _backgroundVolumeLevel)
-                    {
-                        _backgroundVolumeLevel = value;
-                    }
-                }
-                else
-                {
-                    throw new ArgumentOutOfRangeException(nameof(BackgroundVolumeLevel) + " должен быть в диапазоне от [0.00] до [1.00]");
-                }
-            }
-        }
-
         //TODO: тут получается слишком большой выходной файл. Возможно из-за отго что создается большое количество каналов (лесенкой) а нужно всего один
-        public void Merge(string sourceFilePath, List<string> backgroundFiles, string outputFileName)
+        public void Merge(string sourceFilePath, List<Tuple<string, double>> backgroundFilesAndVolume, string outputFileName)
         {
             var mixer = new WaveMixerStream32 { AutoStop = true };
             var mainChannel = new Mp3FileReader(sourceFilePath);
@@ -44,13 +24,13 @@ namespace AudioLayersMerger.AudioManager
             int backgroundIndex = 0;
             do
             {
-                int index = backgroundIndex % backgroundFiles.Count;
+                int index = backgroundIndex % backgroundFilesAndVolume.Count;
 
-                var layerStream = new Mp3FileReader(backgroundFiles[index]);
+                var layerStream = new Mp3FileReader(backgroundFilesAndVolume[index].Item1);
                 var offsetStream = new WaveOffsetStream(layerStream, currentBackgroundTime, TimeSpan.Zero, totalDuration - currentBackgroundTime + layerStream.TotalTime);
                 var channel = new WaveChannel32(offsetStream);
                 channel.PadWithZeroes = false;
-                channel.Volume = (float)BackgroundVolumeLevel;
+                channel.Volume = (float)backgroundFilesAndVolume[index].Item2;
                 mixer.AddInputStream(channel);
 
                 currentBackgroundTime += layerStream.TotalTime;
