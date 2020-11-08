@@ -36,6 +36,8 @@
 
         <TextBlock Grid.Row="0" Grid.Column="3" Grid.RowSpan="2"
                    VerticalAlignment="Center"
+                   ToolTip="{Binding FilePath}"
+                   TextDecorations="{Binding IsOutOfRange, Converter={StaticResource TrueToStrikethroughConverter}}"
                    Text="{Binding FileName, FallbackValue=123.mp3}"></TextBlock>
     </Grid>
 </UserControl>

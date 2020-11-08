@@ -59,7 +59,7 @@ namespace AudioLayersMerger.ViewModels
         public ICommand SelectLayerFilesCommand { get; }
         public ICommand CreateMergedFileCommand { get; }
 
-        IAudioMerger manager = new SimpleAudioMerger();
+        IAudioMerger manager = new SlowSmallAudioMerger();
 
         public MainWindowViewModel()
         {
@@ -68,23 +68,6 @@ namespace AudioLayersMerger.ViewModels
             CreateMergedFileCommand = new LambdaCommand(MergeFiles, (p) => !string.IsNullOrEmpty(SourceFilePath) && Layers.Count > 0);
 
             Layers = new ObservableCollection<BackgroundFileViewModel>();
-            Layers.CollectionChanged += Layers_CollectionChanged;
-        }
-
-        private void Layers_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-            currentPosition = TimeSpan.Zero;
-
-            foreach (var item in Layers)
-            {
-                if (e.OldItems != null && e.OldItems.Contains(item)) { continue; }
-
-                var duration = new Mp3FileReader(item.FilePath).TotalTime;
-
-                item.IsOutOfRange = (currentPosition + duration >= mainFileDuration);
-
-                currentPosition += duration;
-            }
         }
 
         private async void MergeFiles(object obj)
@@ -98,7 +81,8 @@ namespace AudioLayersMerger.ViewModels
                 sw.Start();
                 InProgress = true;
 
-                await Task.Run(() => manager.Merge(SourceFilePath, Layers.Select(l => Tuple.Create(l.FilePath, l.Volume)).ToList(), sfd.FileName));
+                var backgroundFilesData = Layers.Select(l => Tuple.Create(l.FilePath, l.Volume)).ToList();
+                await manager.MergeAsync(SourceFilePath, backgroundFilesData, sfd.FileName);
 
                 InProgress = false;
                 MessageBox.Show($"Выполнено за {sw.Elapsed}", "Выполнено", MessageBoxButton.OK, MessageBoxImage.Information);
@@ -126,12 +110,26 @@ namespace AudioLayersMerger.ViewModels
                     item.OnRemove += Item_OnRemove;
                     Layers.Add(item);
                 }
+
+                RefreshItems();
             }
         }
         
-        private void Item_OnRemove(object sender, EventArgs e)
+        private async void Item_OnRemove(object sender, EventArgs e)
         {
             Layers.Remove(sender as BackgroundFileViewModel);
+            await RefreshItems();
+        }
+
+        private async Task RefreshItems()
+        {
+            currentPosition = TimeSpan.Zero;
+            foreach (BackgroundFileViewModel item in Layers)
+            {
+                var duration = await Task.Run(() => new Mp3FileReader(item.FilePath).TotalTime).ConfigureAwait(false);
+                item.IsOutOfRange = (currentPosition + duration >= mainFileDuration);
+                currentPosition += duration;
+            }
         }
     }
 }

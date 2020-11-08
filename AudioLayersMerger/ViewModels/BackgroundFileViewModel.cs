@@ -20,7 +20,15 @@ namespace AudioLayersMerger.ViewModels
         public string FileName => Path.GetFileName(FilePath);
 
         private bool _isOutOfRange;
-        public bool IsOutOfRange { get => _isOutOfRange; set => Set(ref _isOutOfRange, value); }
+        public bool IsOutOfRange 
+        { 
+            get => _isOutOfRange; 
+            set 
+            {
+                Set(ref _isOutOfRange, value);
+                RaisePropertyChanged(nameof(ItemOpacity)); 
+            } 
+        }
 
         public ICommand RemoveCommand { get; } 
 

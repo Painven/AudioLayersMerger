@@ -57,8 +57,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IAudioMerger.cs" />
-    <Compile Include="AudioMergerV2.cs" />
-    <Compile Include="SimpleAudioMerger.cs" />
+    <Compile Include="LargeFastAudioMerger.cs" />
+    <Compile Include="SlowSmallAudioMerger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

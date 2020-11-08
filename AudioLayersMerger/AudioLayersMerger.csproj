@@ -97,6 +97,7 @@
     <Compile Include="Infrastructure\Commands\CloseWindowCommand.cs" />
     <Compile Include="Infrastructure\Commands\Command.cs" />
     <Compile Include="Infrastructure\Commands\LambdaCommand.cs" />
+    <Compile Include="Infrastructure\Converters\TrueToStrikethroughConverter.cs" />
     <Compile Include="Infrastructure\Converters\BoolToVisibilityConverter.cs" />
     <Compile Include="Infrastructure\Helpers\DependencyObjectHelper.cs" />
     <Compile Include="Models\BackgroundFile.cs" />
