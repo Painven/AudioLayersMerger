@@ -3,13 +3,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:vm="clr-namespace:AudioLayersMerger.ViewModels"
-                    
+             xmlns:vm="clr-namespace:AudioLayersMerger.ViewModels"                    
              Background="White"         
-             d:DataContext="{d:DesignInstance d:Type={x:Type vm:BackgroundFileViewMode}, IsDesignTimeCreatable=True}"
+             d:DataContext=""
              Opacity="{Binding ItemOpacity}"
              d:DesignHeight="50" d:DesignWidth="600"
              mc:Ignorable="d">
+    
     <Grid Margin="6" HorizontalAlignment="Stretch">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>

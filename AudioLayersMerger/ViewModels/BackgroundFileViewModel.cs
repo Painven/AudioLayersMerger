@@ -11,7 +11,17 @@ namespace AudioLayersMerger.ViewModels
         public event EventHandler OnRemove;
 
         private double _volume;
-        public double Volume { get => _volume; set => Set(ref _volume, value); }
+        public double Volume 
+        { 
+            get => _volume;
+            set 
+            {
+                if (value >= 0 && value <= 1)
+                {
+                    Set(ref _volume, value);
+                }               
+            }
+        }
 
         private string _filePath;
         public string FilePath { get => _filePath; set => Set(ref _filePath, value); }
