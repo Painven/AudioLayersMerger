@@ -31,11 +31,7 @@ namespace AudioLayersMerger.ViewModels
         public string SourceFilePath 
         { 
             get => _sourceFilePath; 
-            set 
-            { 
-                Set(ref _sourceFilePath, value);
-                mainFileDuration = new Mp3FileReader(SourceFilePath).TotalTime;
-            } 
+            set  => Set(ref _sourceFilePath, value);
         }
 
         private bool _inProgress;
@@ -91,16 +87,17 @@ namespace AudioLayersMerger.ViewModels
             }
         }
 
-        private void OpenSourceFileDialog(object obj)
+        private async void OpenSourceFileDialog(object obj)
         {
             var ofd = new System.Windows.Forms.OpenFileDialog() { Multiselect = false };
             if (ofd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 SourceFilePath = ofd.FileName;
+                mainFileDuration = await Task.Run(() => new Mp3FileReader(SourceFilePath).TotalTime);
             }
         }
 
-        private void OpenLayerFilesDialog(object obj)
+        private async void OpenLayerFilesDialog(object obj)
         {
             var ofd = new System.Windows.Forms.OpenFileDialog() { Multiselect = true };
             if (ofd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
@@ -111,26 +108,26 @@ namespace AudioLayersMerger.ViewModels
                     item.Volume = Volume;
                     item.OnRemove += Item_OnRemove;
                     Layers.Add(item);
+                    item.Duaration = await Task.Run(() => new Mp3FileReader(item.FilePath).TotalTime);
                 }
 
                 RefreshItems();
             }
         }
         
-        private async void Item_OnRemove(object sender, EventArgs e)
+        private void Item_OnRemove(object sender, EventArgs e)
         {
             Layers.Remove(sender as BackgroundFileViewModel);
-            await RefreshItems();
+            RefreshItems();
         }
 
-        private async Task RefreshItems()
+        private void RefreshItems()
         {
             currentPosition = TimeSpan.Zero;
             foreach (BackgroundFileViewModel item in Layers)
-            {
-                var duration = await Task.Run(() => new Mp3FileReader(item.FilePath).TotalTime).ConfigureAwait(false);
-                item.IsOutOfRange = (currentPosition + duration >= mainFileDuration);
-                currentPosition += duration;
+            {                
+                item.IsOutOfRange = (currentPosition + item.Duaration >= mainFileDuration);
+                currentPosition += item.Duaration;
             }
         }
     }

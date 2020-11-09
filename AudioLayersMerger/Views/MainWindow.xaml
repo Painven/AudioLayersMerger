@@ -38,6 +38,7 @@
                     Command="{Binding SelectSourceFileCommand}"
                     Style="{StaticResource FontAwesomeButtonStyle}"/>
             <Label Grid.Column="1" Grid.Row="0" 
+                   FontWeight="Bold"
                    Content="{Binding SourceFilePath, TargetNullValue=Основная звуковая дорожка}" 
                    
                    Style="{StaticResource ActionCaptionLabelStyle}"/>

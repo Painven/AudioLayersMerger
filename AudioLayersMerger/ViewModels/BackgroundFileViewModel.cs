@@ -30,7 +30,8 @@ namespace AudioLayersMerger.ViewModels
             } 
         }
 
-        public ICommand RemoveCommand { get; } 
+        public ICommand RemoveCommand { get; }
+        public TimeSpan Duaration { get; set; }
 
         public BackgroundFileViewModel(string filePath) : this()
         {
