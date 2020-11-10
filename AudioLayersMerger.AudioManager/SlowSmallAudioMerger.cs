@@ -26,7 +26,7 @@ namespace AudioLayersMerger.AudioManager
         {
             var wave32 = new Wave32To16Stream(mixer);
             var mp3Writer = new LameMP3FileWriter(outputFileName, wave32.WaveFormat, 128);
-            await wave32.CopyToAsync(mp3Writer, 16 * 1000 * 1000);
+            await wave32.CopyToAsync(mp3Writer, 8 * 1000 * 1000);
 
             mp3Writer.Dispose();
             wave32.Dispose();

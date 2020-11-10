@@ -40,7 +40,7 @@ namespace AudioLayersMerger.ViewModels
         private bool _isWorking;
         public bool IsWorking { get => _isWorking; set => Set(ref _isWorking, value); }
 
-        private double _volume = 0.5;
+        private double _volume = 0.25;
         public double Volume 
         { 
             get => _volume; 
