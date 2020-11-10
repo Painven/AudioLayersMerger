@@ -17,11 +17,13 @@
 
     <DockPanel LastChildFill="True">
         <ProgressBar DockPanel.Dock="Bottom" 
-                     IsIndeterminate="True" Height="20"  
-                     Visibility="{Binding InProgress, Converter={StaticResource BoolToVisibilityConverter}}" />
+                     Minimum="0" Maximum="1" IsIndeterminate="True"
+                     Height="20"  
+                     Visibility="{Binding IsWorking, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
         <Grid>
             <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
@@ -33,21 +35,29 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <Button DockPanel.Dock="Left" Content="&#xf65e;"
+            <Button DockPanel.Dock="Left" Content="&#xf1c7;"
                     Grid.Row="0" Grid.Column="0"
-                    Command="{Binding SelectSourceFileCommand}"
+                    Command="{Binding ConvertFileFormat}"
                     Style="{StaticResource FontAwesomeButtonStyle}"/>
             <Label Grid.Column="1" Grid.Row="0" 
                    FontWeight="Bold"
-                   Content="{Binding SourceFilePath, TargetNullValue=Основная звуковая дорожка}" 
-                   
+                   Content="Преобразовать m4a --> mp3"               
+                   Style="{StaticResource ActionCaptionLabelStyle}"/>
+            
+            <Button DockPanel.Dock="Left" Content="&#xf65e;"
+                    Grid.Row="1" Grid.Column="0"
+                    Command="{Binding SelectSourceFileCommand}"
+                    Style="{StaticResource FontAwesomeButtonStyle}"/>
+            <Label Grid.Row="1"  Grid.Column="1" 
+                   FontWeight="Bold"
+                   Content="{Binding SourceFilePath, TargetNullValue=Основная звуковая дорожка}"               
                    Style="{StaticResource ActionCaptionLabelStyle}"/>
 
-            <Button Grid.Column="0" Grid.Row="1" Content="&#xf65e;" 
+            <Button Grid.Row="2" Grid.Column="0"  Content="&#xf65e;" 
                     Command="{Binding SelectLayerFilesCommand}"
                     Style="{StaticResource FontAwesomeButtonStyle}"/>
-            <Label Grid.Column="1" Grid.Row="1" Content="Файлы на задний фон" Style="{StaticResource ActionCaptionLabelStyle}"/>
-            <ListBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Margin="2 6 2 6"        
+            <Label Grid.Row="2" Grid.Column="1"  Content="Файлы на задний фон" Style="{StaticResource ActionCaptionLabelStyle}"/>
+            <ListBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Margin="2 6 2 6"        
                      Visibility="{Binding Layers.Count, Converter={StaticResource BoolToVisibilityConverter}}"
                       ItemsSource="{Binding Layers}">
                 <ListBox.ItemTemplate>
@@ -57,13 +67,13 @@
                 </ListBox.ItemTemplate>
             </ListBox>
 
-            <Button Grid.Row="3" Content="&#xf028;" 
+            <Button Grid.Row="4" Content="&#xf028;" 
                     Opacity="{Binding Volume}"
                     Style="{StaticResource FontAwesomeButtonStyle}"/>
-            <Slider Grid.Row="3" Grid.Column="1" VerticalAlignment="Center" Margin="30 1 4 1" Maximum="1" Minimum="0.05" Value="{Binding Volume}" SmallChange="0.01" LargeChange="0.1"/>
+            <Slider Grid.Row="4" Grid.Column="1" VerticalAlignment="Center" Margin="30 1 4 1" Maximum="1" Minimum="0.05" Value="{Binding Volume}" SmallChange="0.01" LargeChange="0.1"/>
            
             <Button Content="&#xf5fd;" 
-                    Grid.Row="4" Grid.Column="0"
+                    Grid.Row="5" Grid.Column="0"
                     Command="{Binding CreateMergedFileCommand}" Style="{StaticResource FontAwesomeButtonStyle}"/>
         </Grid>
 

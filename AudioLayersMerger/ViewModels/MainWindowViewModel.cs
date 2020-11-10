@@ -34,8 +34,11 @@ namespace AudioLayersMerger.ViewModels
             set  => Set(ref _sourceFilePath, value);
         }
 
-        private bool _inProgress;
-        public bool InProgress { get => _inProgress; set => Set(ref _inProgress, value); }
+        private double _progressPercent;
+        public double ProgressPercent { get => _progressPercent; set => Set(ref _progressPercent, value); }
+
+        private bool _isWorking;
+        public bool IsWorking { get => _isWorking; set => Set(ref _isWorking, value); }
 
         private double _volume = 0.5;
         public double Volume 
@@ -56,6 +59,7 @@ namespace AudioLayersMerger.ViewModels
         public ICommand SelectSourceFileCommand { get; }
         public ICommand SelectLayerFilesCommand { get; }
         public ICommand CreateMergedFileCommand { get; }
+        public ICommand ConvertFileFormat { get; }
 
         IAudioMerger manager = new SlowSmallAudioMerger();
 
@@ -64,8 +68,20 @@ namespace AudioLayersMerger.ViewModels
             SelectSourceFileCommand = new LambdaCommand(OpenSourceFileDialog);
             SelectLayerFilesCommand = new LambdaCommand(OpenLayerFilesDialog, (p) => File.Exists(SourceFilePath));
             CreateMergedFileCommand = new LambdaCommand(MergeFiles, (p) => !string.IsNullOrEmpty(SourceFilePath) && Layers.Count > 0);
+            ConvertFileFormat = new LambdaCommand(ConvertFormat);
 
             Layers = new ObservableCollection<BackgroundFileViewModel>();
+        }
+
+        private async void ConvertFormat(object obj)
+        {
+            var ofd = new System.Windows.Forms.OpenFileDialog() { Multiselect = false, Filter = "M4A файлы |*.m4a" };
+            if (ofd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                IsWorking = true;
+                await manager.ConvertM4aToMp3(ofd.FileName);
+                IsWorking = false;
+            }
         }
 
         private async void MergeFiles(object obj)
@@ -77,19 +93,34 @@ namespace AudioLayersMerger.ViewModels
             {
                 var sw = new Stopwatch();
                 sw.Start();
-                InProgress = true;
+
 
                 var backgroundFilesData = Layers.Select(l => Tuple.Create(l.FilePath, l.Volume)).ToList();
-                await manager.MergeAsync(SourceFilePath, backgroundFilesData, sfd.FileName);
 
-                InProgress = false;
-                MessageBox.Show($"Выполнено за {sw.Elapsed}", "Выполнено", MessageBoxButton.OK, MessageBoxImage.Information);
+                IsWorking = true;
+                try
+                {
+                    await manager.MergeAsync(SourceFilePath, backgroundFilesData, sfd.FileName);
+                    MessageBox.Show($"Выполнено за {sw.Elapsed}", "Выполнено", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                catch(Exception ex)
+                {
+                    MessageBox.Show($"{ex.Message}\r\n\r\n{ex.StackTrace}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+                finally
+                {
+                    IsWorking = false;
+                }
+                
+
+
+                
             }
         }
 
         private async void OpenSourceFileDialog(object obj)
         {
-            var ofd = new System.Windows.Forms.OpenFileDialog() { Multiselect = false };
+            var ofd = new System.Windows.Forms.OpenFileDialog() { Multiselect = false, Filter = "MP3 файлы|*.mp3" };
             if (ofd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 SourceFilePath = ofd.FileName;

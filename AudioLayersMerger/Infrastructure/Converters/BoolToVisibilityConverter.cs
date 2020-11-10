@@ -13,10 +13,11 @@ namespace AudioLayersMerger.Infrastructure.Converters
             {
                 return ((bool)value) ? Visibility.Visible : Visibility.Collapsed;
             }
-            else if(value is int)
+            else if (value is int)
             {
                 return ((int)value) > 0 ? Visibility.Visible : Visibility.Collapsed;
             }
+
             return null;
         }
 
