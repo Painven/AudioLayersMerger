@@ -3,6 +3,7 @@ using AudioLayersMerger.Infrastructure.Commands;
 using NAudio.Wave;
 using System;
 using System.Collections.ObjectModel;
+using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -58,6 +59,7 @@ namespace AudioLayersMerger.ViewModels
 
         public ICommand SelectSourceFileCommand { get; }
         public ICommand SelectLayerFilesCommand { get; }
+        public ICommand SelectLayerRandomFilesCommand { get; }
         public ICommand CreateMergedFileCommand { get; }
         public ICommand ConvertFileFormat { get; }
 
@@ -67,6 +69,7 @@ namespace AudioLayersMerger.ViewModels
         {
             SelectSourceFileCommand = new LambdaCommand(OpenSourceFileDialog);
             SelectLayerFilesCommand = new LambdaCommand(OpenLayerFilesDialog, (p) => File.Exists(SourceFilePath));
+            SelectLayerRandomFilesCommand = new LambdaCommand(AddRandomFiles, (p) => File.Exists(SourceFilePath));
             CreateMergedFileCommand = new LambdaCommand(MergeFiles, (p) => !string.IsNullOrEmpty(SourceFilePath) && Layers.Count > 0);
             ConvertFileFormat = new LambdaCommand(ConvertFormat);
 
@@ -135,17 +138,48 @@ namespace AudioLayersMerger.ViewModels
             {
                 foreach (var file in ofd.FileNames)
                 {
-                    var item = new BackgroundFileViewModel(file);
-                    item.Volume = Volume;
-                    item.OnRemove += Item_OnRemove;
-                    Layers.Add(item);
-                    item.Duaration = await Task.Run(() => new Mp3FileReader(item.FilePath).TotalTime);
+                    await AddItemFromFileName(file);
                 }
 
                 RefreshItems();
             }
         }
-        
+
+        private async Task AddItemFromFileName(string file)
+        {
+            var item = new BackgroundFileViewModel(file);
+            item.Volume = Volume;
+            item.OnRemove += Item_OnRemove;
+            Layers.Add(item);
+            item.Duaration = await Task.Run(() => new Mp3FileReader(item.FilePath).TotalTime);
+        }
+
+        private async void AddRandomFiles(object obj)
+        {
+            var ofd = new System.Windows.Forms.FolderBrowserDialog()
+            {
+                SelectedPath = ConfigurationManager.AppSettings["default_random_folder_path"]
+            };
+
+            if (ofd.ShowDialog() != System.Windows.Forms.DialogResult.OK) { return; }        
+            var dirFiles = Directory.GetFiles(ofd.SelectedPath, "*.mp3", SearchOption.AllDirectories);
+            if (dirFiles.Length == 0) { return; }
+            
+            do
+            {
+                var nextRandomFile = dirFiles[new Random().Next(0, dirFiles.Length)];
+
+                await AddItemFromFileName(nextRandomFile);
+                await Task.Delay(TimeSpan.FromMilliseconds(50));
+
+            } while ((Layers.Sum(l => l.Duaration.TotalSeconds)) < mainFileDuration.TotalSeconds);
+
+            Layers.Remove(Layers.Last());
+            RefreshItems();
+            
+            
+        }
+
         private void Item_OnRemove(object sender, EventArgs e)
         {
             Layers.Remove(sender as BackgroundFileViewModel);
